@@ -1,0 +1,70 @@
+timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 10/31/2019 02:35:02 PM
+// Design Name: 
+// Module Name: lab6code
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+module lab6(clk, sw, reset, led);
+
+    input clk, reset;
+    input [7:0]sw;
+    output led; 
+    wire clk5;
+    wire [7:0]cnt;
+
+    compare A(.R(sw), .cnt(cnt), .out(led));
+    counter B(.clk(clk5), .reset(reset), .cnt(cnt));
+    
+     clk_wiz_0 instance_name
+   (
+    // Clock out ports
+    .clk_out1(clk5),     // output clk_out1
+    // Status and control signals
+    .reset(reset), // input reset
+   // Clock in ports
+    .clk_in1(clk));      // input clk_in1
+
+endmodule
+
+
+module compare(R, cnt, out);
+    input [7:0] R;
+    input [7:0] cnt;
+    output reg out;
+    
+    always@(R, cnt)
+    begin
+        if (cnt < R)
+            out = 1;
+        else
+            out = 0;
+    end 
+endmodule
+
+module counter(clk, reset, cnt);
+    input clk, reset;
+    output reg [7:0] cnt;
+    
+    always@(posedge clk)
+    begin
+        if (reset == 1)
+            cnt = 0;
+        else
+            cnt = cnt + 1;
+    end
+endmodule
