@@ -1,0 +1,83 @@
+#/bin/bash
+# run the script with one command line argument, which represents the input file name
+# $./Lab7_2script movie_actors.txt
+# movie_actors.txt is the input file name as the command line argument
+# First, ask the user to input two movie titles
+#        if both movie titles are in the movie_actors.txt, continue;
+#        otherwise, quit immediately
+# Repeatedly display the main menu to let the user choose an option (enter Q or q to quit):
+#                       if opiton is A (or a), print all the actors in either of the two movies;
+#                       if option is C (or c), print all the common actors in both of the movies;
+#                       if option is O (or o), print all the actors who are in either one movie, but not in both.
+#                       if opiton is Q (or q), quit the script
+#                       if other option, display the message of invalid choice.
+
+# Begin with checking whether the number of the command line arguments is exactly one
+if [ $# -ne 1 ]
+then
+    echo "Warning: need exactly one command line argument."
+    echo "Usage: $0 <inputfile_name>"
+    exit 1
+fi
+
+# Ask the user to input two movie titles to search for
+echo "Please input the first movie title:"
+read movie1
+echo "Please input the second movie title:"
+read movie2
+# Check if both movies are in the input file
+# if both movie titles are valid, continue...
+# otherwise quit the script immediately
+if [ `grep -c -i "$movie1" $1` -gt 0 ] && [ `grep -c -i "$movie2" $1` -gt 0 ]
+then
+    echo    
+    echo "Your input matches these two movies: "
+    grep -m 1 -i -o "^.*$movie1.*;" $1 | cut -d';' -f 1
+    grep -m 1 -i -o "^.*$movie2.*;" $1 | cut -d';' -f 1
+    echo "Both movies are in the database, please continue..."
+    #create two sets for the actors in each movie respectively
+    grep -m 1 -i "^.*$movie1.*;" $1 | cut -f 2- -d';' | cut -d',' -f 1- --output-delimiter=$'\n' > actors_in_movie1.txt
+    grep -m 1 -i "^.*$movie2.*;" $1 | cut -f 2- -d';' | cut -d',' -f 1- --output-delimiter=$'\n' > actors_in_movie2.txt
+else
+    echo "Invalid movie title."
+    exit 1
+fi
+
+# Ask the user to input the option for searching to begin with
+echo
+echo "Please input your menu option (enter Q or q to quit)"
+echo "A --to print all the actors in either of the two movies."
+echo "C --to print all the common actors in both of the movies."
+echo "O --to print all the actors who are in only one movie, but not in both."
+read usr_option
+
+# Your script should start here
+# create a loop to repeatedly ask the user to input the option for searching until the user enters Q or q to quit
+
+while [ $usr_option != "q" ] && [ $usr_option != "Q" ]
+do
+	case $usr_option in
+		"A"|"a") echo "All actors in both movies:"
+		     cat actors_in_movie1.txt actors_in_movie2.txt | sort -u;;
+		"C"|"c") echo "Common actors in both movies:"
+		     sort actors_in_movie1.txt actors_in_movie2.txt | uniq -d;;
+		"O"|"o") echo "Actors only in one movie:"
+		     sort actors_in_movie1.txt actors_in_movie2.txt | uniq -u;;
+		*) echo "Invalid option.";;
+	esac
+	
+	echo
+	echo "Please input your menu option (enter Q or q to quit)"
+	echo "A --to print all the actors in either of the two movies."
+	echo "C --to print all the common actors in both of the movies."
+	echo "O --to print all the actors who are in only one movie, but not in both."
+	read usr_option
+
+done
+
+
+#delete the temporary files
+echo "Delete all temporary files..."
+rm actors_in_movie1.txt
+rm actors_in_movie2.txt
+
